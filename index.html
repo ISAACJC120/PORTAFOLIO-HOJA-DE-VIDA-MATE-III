@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portafolio — Cálculo Integral · Isaac Chávez</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:          #080c14;
+      --border:      rgba(0,255,224,0.12);
+      --cyan:        #00ffe0;
+      --cyan-dim:    #00c8b0;
+      --violet:      #a259ff;
+      --violet-dim:  #7c3fe0;
+      --text:        #e2eaf5;
+      --muted:       #5e7395;
+      --card-bg:     rgba(13,19,32,0.85);
+      --glow-cyan:   0 0 28px rgba(0,255,224,0.35);
+      --glow-violet: 0 0 28px rgba(162,89,255,0.40);
+      --font-display: 'Syne', sans-serif;
+      --font-mono:    'Space Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,255,224,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,224,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      animation: grid-drift 30s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes grid-drift {
+      from { background-position: 0 0; }
+      to   { background-position: 48px 48px; }
+    }
+
+    /* Orbs */
+    .orb {
+      position: fixed; border-radius: 50%; filter: blur(90px);
+      pointer-events: none; z-index: 0;
+      animation: float 18s ease-in-out infinite;
+    }
+    .orb-1 {
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(0,255,224,0.13), transparent 70%);
+      top: -120px; left: -120px;
+    }
+    .orb-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(162,89,255,0.16), transparent 70%);
+      bottom: -100px; right: -100px; animation-delay: -9s;
+    }
+    @keyframes float {
+      0%,100% { transform: translate(0,0) scale(1); }
+      33%      { transform: translate(30px,-20px) scale(1.05); }
+      66%      { transform: translate(-20px,30px) scale(0.95); }
+    }
+
+    /* ── UCE BANNER ── */
+    .uce-banner {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+      gap: 1.8rem; padding: 1.4rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,16,28,0.82);
+      backdrop-filter: blur(14px);
+      flex-wrap: wrap;
+      animation: fade-in 0.5s ease both;
+    }
+
+    .uce-shield {
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 14px rgba(192,57,43,0.45));
+      transition: filter 0.35s;
+    }
+    .uce-shield:hover {
+      filter: drop-shadow(0 0 24px rgba(192,57,43,0.7));
+    }
+
+    .uce-info { text-align: left; }
+    .uce-name {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(0.9rem, 2vw, 1.1rem);
+      color: var(--text); line-height: 1.2;
+    }
+    .uce-faculty {
+      font-size: 0.68rem; color: var(--muted);
+      letter-spacing: 0.07em; margin-top: 0.2rem;
+    }
+    .uce-career {
+      font-size: 0.67rem; color: var(--cyan-dim);
+      letter-spacing: 0.1em; margin-top: 0.12rem;
+      text-transform: uppercase;
+    }
+
+    /* ── LAYOUT ── */
+    .page {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto; padding: 0 2rem;
+    }
+
+    /* ── HERO ── */
+    header {
+      padding: 4rem 0 3rem;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem; letter-spacing: 0.18em;
+      color: var(--cyan);
+      border: 1px solid var(--border);
+      background: rgba(0,255,224,0.06);
+      padding: 0.35rem 1rem; border-radius: 2px;
+      margin-bottom: 1.6rem; text-transform: uppercase;
+      animation: fade-in 0.6s ease both;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 800; line-height: 1.08;
+      letter-spacing: -0.02em;
+      animation: slide-up 0.7s ease 0.1s both;
+    }
+    .title-calc {
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--violet) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      margin-top: 1.2rem; color: var(--muted);
+      font-size: 0.88rem; letter-spacing: 0.04em;
+      animation: fade-in 0.8s ease 0.3s both;
+    }
+
+    .integral-display {
+      margin: 2.5rem auto 0;
+      display: inline-block;
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      color: var(--cyan-dim); opacity: 0.7;
+      letter-spacing: 0.06em;
+      animation: fade-in 1s ease 0.5s both;
+    }
+
+    /* ── STATS ── */
+    .stats {
+      display: flex; flex-wrap: wrap; gap: 1px;
+      border: 1px solid var(--border); border-radius: 6px;
+      overflow: hidden; margin-bottom: 3.5rem;
+      background: var(--border);
+    }
+    .stat {
+      flex: 1; min-width: 120px;
+      background: var(--card-bg);
+      padding: 1.7rem 1.4rem; text-align: center;
+      backdrop-filter: blur(10px);
+    }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 2rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label {
+      font-size: 0.68rem; letter-spacing: 0.14em;
+      color: var(--muted); text-transform: uppercase;
+      margin-top: 0.3rem;
+    }
+
+    /* ── INFO PILLS (Estudiante / Docente) ── */
+    .info-row {
+      display: flex; flex-wrap: wrap; gap: 1rem;
+      margin-bottom: 4rem; justify-content: center;
+    }
+    .info-pill {
+      display: flex; align-items: center; gap: 0.8rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px; padding: 1rem 1.6rem;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .info-pill:hover {
+      border-color: rgba(0,255,224,0.25);
+      box-shadow: 0 0 14px rgba(0,255,224,0.08);
+    }
+    .info-pill-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .info-pill-label {
+      font-size: 0.62rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .info-pill-value {
+      font-family: var(--font-display);
+      font-size: 1rem; font-weight: 700; color: var(--text);
+    }
+    .info-pill-value.cyan   { color: var(--cyan); }
+    .info-pill-value.violet { color: var(--violet); }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 0.68rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 2rem; text-align: center;
+    }
+    .section-label span { color: var(--violet); }
+
+    /* ── CARDS ── */
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.8rem; margin-bottom: 5rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px; padding: 2.5rem 2rem;
+      display: flex; flex-direction: column;
+      align-items: flex-start; gap: 1.4rem;
+      position: relative; overflow: hidden;
+      transition: transform 0.35s cubic-bezier(.22,.8,.4,1),
+                  border-color 0.35s, box-shadow 0.35s;
+      backdrop-filter: blur(10px);
+      animation: fade-in 0.8s ease both;
+    }
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.25s; }
+
+    .card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      border-radius: 6px 6px 0 0;
+      transition: opacity 0.35s; opacity: 0.5;
+    }
+    .card-cyan::before   { background: linear-gradient(90deg, var(--cyan), transparent); }
+    .card-violet::before { background: linear-gradient(90deg, var(--violet), transparent); }
+
+    .card::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.03), transparent 60%);
+      pointer-events: none;
+    }
+
+    .card:hover { transform: translateY(-6px) scale(1.012); }
+    .card-cyan:hover   { border-color: var(--cyan);   box-shadow: var(--glow-cyan); }
+    .card-violet:hover { border-color: var(--violet); box-shadow: var(--glow-violet); }
+    .card-cyan:hover::before   { opacity: 1; }
+    .card-violet:hover::before { opacity: 1; }
+
+    .card-icon-wrap {
+      width: 52px; height: 52px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .card-cyan   .card-icon-wrap { background: rgba(0,255,224,0.08);  border: 1px solid rgba(0,255,224,0.2); }
+    .card-violet .card-icon-wrap { background: rgba(162,89,255,0.08); border: 1px solid rgba(162,89,255,0.2); }
+
+    .card-tag {
+      font-size: 0.65rem; letter-spacing: 0.18em;
+      text-transform: uppercase; margin-bottom: 0.4rem;
+    }
+    .card-cyan   .card-tag { color: var(--cyan-dim); }
+    .card-violet .card-tag { color: var(--violet-dim); }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem; font-weight: 700;
+      color: var(--text); line-height: 1.3; margin-bottom: 0.5rem;
+    }
+    .card-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-family: var(--font-mono); font-size: 0.82rem;
+      font-weight: 700; letter-spacing: 0.06em;
+      text-decoration: none;
+      padding: 0.85rem 1.8rem; border-radius: 4px;
+      border: 1px solid transparent; cursor: pointer;
+      position: relative; overflow: hidden;
+      transition: background 0.3s, box-shadow 0.3s,
+                  transform 0.25s cubic-bezier(.22,.8,.4,1), border-color 0.3s;
+      width: 100%; justify-content: center; text-align: center;
+    }
+    .btn::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .btn:hover::after { opacity: 1; }
+
+    .btn-cyan {
+      background: rgba(0,255,224,0.1);
+      border-color: rgba(0,255,224,0.4); color: var(--cyan);
+    }
+    .btn-cyan:hover {
+      background: rgba(0,255,224,0.18); border-color: var(--cyan);
+      box-shadow: var(--glow-cyan); transform: translateY(-2px);
+    }
+
+    .btn-violet {
+      background: rgba(162,89,255,0.1);
+      border-color: rgba(162,89,255,0.4); color: var(--violet);
+    }
+    .btn-violet:hover {
+      background: rgba(162,89,255,0.18); border-color: var(--violet);
+      box-shadow: var(--glow-violet); transform: translateY(-2px);
+    }
+
+    .btn-arrow { transition: transform 0.25s; }
+    .btn:hover .btn-arrow { transform: translateX(3px); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 0; text-align: center;
+    }
+    .footer-text {
+      font-size: 0.72rem; color: var(--muted);
+      letter-spacing: 0.06em; line-height: 2;
+    }
+    .footer-text strong { color: var(--cyan); font-weight: 400; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slide-up {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 3rem 0 2rem; }
+      .shortcuts-grid { grid-template-columns: 1fr; }
+      .uce-banner { flex-direction: column; text-align: center; }
+      .uce-info { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- ══════════ UCE INSTITUTIONAL BANNER ══════════ -->
+  <!--
+    Escudo de la UCE renderizado en SVG puro con los colores oficiales:
+    Rojo escarlata (#C0392B) y Azul cobalto (#1A4F8A)
+    Lema: "Omnium Potentior Est Sapientia"
+  -->
+  <div class="uce-banner">
+    <svg class="uce-shield" width="68" height="80" viewBox="0 0 68 80" xmlns="http://www.w3.org/2000/svg" aria-label="Escudo Universidad Central del Ecuador">
+      <!-- Escudo base azul -->
+      <path d="M2 2 H66 V50 Q66 74 34 78 Q2 74 2 50 Z"
+            fill="#1A4F8A" stroke="#8B0000" stroke-width="2"/>
+      <!-- Franja diagonal roja (banda de honor) -->
+      <path d="M2 28 L66 54 L66 50 L2 24 Z" fill="#C0392B" opacity="0.9"/>
+      <!-- Libro abierto (sabiduría) -->
+      <rect x="18" y="14" width="14" height="10" rx="1.5"
+            fill="none" stroke="#fff" stroke-width="1.3"/>
+      <rect x="34" y="14" width="14" height="10" rx="1.5"
+            fill="none" stroke="#fff" stroke-width="1.3"/>
+      <line x1="34" y1="14" x2="34" y2="24" stroke="#fff" stroke-width="1.5"/>
+      <!-- Integral / símbolo de conocimiento -->
+      <text x="34" y="42" text-anchor="middle"
+            font-size="13" fill="#fff" font-family="Georgia,serif"
+            font-style="italic">∫</text>
+      <!-- Estrellas superiores -->
+      <text x="9"  y="14" font-size="8" fill="#FFD700" font-family="serif">★</text>
+      <text x="53" y="14" font-size="8" fill="#FFD700" font-family="serif">★</text>
+      <!-- Cinta del lema -->
+      <path d="M8 63 Q34 70 60 63" fill="#C0392B" stroke="#8B0000" stroke-width="0.5"/>
+      <text x="34" y="67" text-anchor="middle"
+            font-size="4.2" fill="#fff" font-family="Georgia,serif" letter-spacing="0.4">
+        OMNIUM · POTENTIOR
+      </text>
+      <!-- Borde decorativo inferior -->
+      <path d="M2 50 Q2 74 34 78 Q66 74 66 50"
+            fill="none" stroke="#C0392B" stroke-width="1.2"/>
+    </svg>
+
+    <div class="uce-info">
+      <div class="uce-name">Universidad Central del Ecuador</div>
+      <div class="uce-faculty">Facultad de Filosofía, Letras y Ciencias de la Educación</div>
+      <div class="uce-career">Pedagogía en Informática</div>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- ══════════ HERO ══════════ -->
+    <header>
+      <div class="badge">Pedagogía en Informática &nbsp;·&nbsp; Tercer Semestre</div>
+      <h1>
+        Portafolio de<br>
+        <span class="title-calc">Cálculo Integral</span>
+      </h1>
+      <p class="subtitle">
+        Exploraciones matemáticas &nbsp;∙&nbsp; Visualizaciones &nbsp;∙&nbsp; Proyectos aplicados
+      </p>
+      <div class="integral-display">
+        ∫<sub>a</sub><sup>b</sup> f(x) dx &nbsp;=&nbsp; F(b) − F(a)
+      </div>
+    </header>
+
+    <!-- ══════════ STATS ══════════ -->
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Integrales</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3°</div>
+        <div class="stat-label">Semestre</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">2025</div>
+        <div class="stat-label">Período</div>
+      </div>
+    </div>
+
+    <!-- ══════════ ESTUDIANTE & DOCENTE ══════════ -->
+    <div class="info-row">
+      <div class="info-pill">
+        <span class="info-pill-icon">🎓</span>
+        <div>
+          <div class="info-pill-label">Estudiante</div>
+          <div class="info-pill-value cyan">Isaac Chávez</div>
+        </div>
+      </div>
+      <div class="info-pill">
+        <span class="info-pill-icon">👨‍🏫</span>
+        <div>
+          <div class="info-pill-label">Docente</div>
+          <div class="info-pill-value violet">Diego Tipan</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ ACCESOS DIRECTOS ══════════ -->
+    <p class="section-label">// <span>01</span> &nbsp;— Accesos Directos</p>
+
+    <section class="shortcuts-grid">
+
+      <!-- CARD 1: Portafolio Notion -->
+      <div class="card card-cyan">
+        <div class="card-icon-wrap">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+               stroke="#00ffe0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"/>
+            <polyline points="8 6 2 12 8 18"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-tag">Portafolio · Notion</div>
+          <div class="card-title">Proyectos & Código</div>
+          <div class="card-desc">
+            Navega por todos mis proyectos, visualizaciones interactivas y
+            demostraciones prácticas de Cálculo Integral.
+          </div>
+        </div>
+        <a href="https://www.notion.so/PORTAFOLIO-POR-ISAAC-CH-VEZ-4b43534c089183e5af3a01cbdc4072b3?source=copy_link"
+           target="_blank" rel="noopener noreferrer"
+           class="btn btn-cyan">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"/>
+            <polyline points="8 6 2 12 8 18"/>
+          </svg>
+          Abrir Portafolio Digital
+          <span class="btn-arrow">→</span>
+        </a>
+      </div>
+
+      <!-- CARD 2: Hoja de Vida Google Drive -->
+      <div class="card card-violet">
+        <div class="card-icon-wrap">
+          <!-- Google Drive triangle icon (violet tones) -->
+          <svg width="30" height="28" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.6 66.85L29.41 26.1l22.79 39.7z"  fill="#a259ff" opacity="0.3"/>
+            <path d="M29.41 26.1L6.6 66.85l10.38 6 22.8-39.75z" fill="#a259ff" opacity="0.6"/>
+            <path d="M52.2 65.8L29.41 26.1l10.39-6L62.6 59.8z"  fill="#a259ff" opacity="0.45"/>
+            <path d="M6.6 66.85h45.6l5.2 9H1.4z"  fill="#a259ff" opacity="0.85"/>
+            <path d="M52.2 65.8h20.79l5.19 9H57.39z" fill="#c084ff"/>
+            <path d="M29.41 26.1L39.8 7l10.39 6L39.8 32.1z"   fill="#a259ff" opacity="0.75"/>
+            <path d="M39.8 7H60.6L87.3 53.25l-10.38 6L50.19 13z" fill="#a259ff" opacity="0.55"/>
+          </svg>
+        </div>
+        <div class="card-meta">
+          <div class="card-tag">Curriculum Vitae · Google Drive</div>
+          <div class="card-title">Hoja de Vida</div>
+          <div class="card-desc">
+            Consulta mi perfil académico, habilidades técnicas y experiencia
+            directamente desde Google Drive.
+          </div>
+        </div>
+        <a href="https://drive.google.com/file/d/1NHvATTXsvqHeRpTMMopwavdzNLYsB3RX/view?usp=sharing"
+           target="_blank" rel="noopener noreferrer"
+           class="btn btn-violet">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          Ver Hoja de Vida (Google Drive)
+          <span class="btn-arrow">→</span>
+        </a>
+      </div>
+
+    </section>
+
+    <!-- ══════════ FOOTER ══════════ -->
+    <footer>
+      <p class="footer-text">
+        <strong>Universidad Central del Ecuador</strong> &nbsp;·&nbsp; Pedagogía en Informática<br>
+        Estudiante: Isaac Chávez &nbsp;·&nbsp; Docente: Diego Tipan &nbsp;·&nbsp; Cálculo Integral &nbsp;·&nbsp; 2025
+      </p>
+    </footer>
+
+  </div><!-- /.page -->
+</body>
+</html>
